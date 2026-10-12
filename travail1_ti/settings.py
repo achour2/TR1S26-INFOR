@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'travelhub.apps.TravelhubConfig',
-    'rest_framework',
+    # 'rest_framework',
+    'psycopg'
+
+    # 'travelhub',
 
 ]
 
@@ -77,10 +80,19 @@ WSGI_APPLICATION = 'travail1_ti.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "travelhub",
+        "USER": "traveluser",
+        "PASSWORD": "1234",
+        "HOST": "localhost",
+        "PORT": "5432",
+}
+    
 }
 
 
