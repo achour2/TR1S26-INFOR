@@ -1,16 +1,23 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
-class utilisateurs (models.Model):
-    nom = models.CharField(max_length=100)
-    prenom = models.CharField(max_length=100)
-    email = models.EmailField( max_length=100) # EmailField : vérifie  que le format d'un email est valide
-    proprietaire=models.BooleanField(default=False)
+# class utilisateurs (models.Model):
+#     nom = models.CharField(max_length=100)
+#     prenom = models.CharField(max_length=100)
+#     email = models.EmailField( max_length=100) # EmailField : vérifie  que le format d'un email est valide
+#     proprietaire=models.BooleanField(default=False)
     # est ce que on doit ajouter un mot de passe ??
 
 
+
+# class Profile(models.Model):
+#     user = models.OneToOneField(
+#         User,
+#         on_delete=models.CASCADE
+#     )
         
 class   voyages (models.Model):
     class Statut(models.TextChoices): #les etats possibles pour le statut
@@ -23,7 +30,7 @@ class   voyages (models.Model):
     date_Debut = models.DateField(default=timezone.now) # une fonction qui permet de entrer une dete AAAA-MM-JJ
     date_Fin = models.DateField (default=timezone.now)
     statut = models.CharField(  max_length=20,choices=Statut.choices,default=Statut.PLANIFIE) # il est obligatoire de choisir un etat parmi ce qu'on a
-    utilisateurs=models.ManyToManyField(utilisateurs)
+    utilisateurs=models.ManyToManyField(User)
     
 
 class destinations(models.Model):

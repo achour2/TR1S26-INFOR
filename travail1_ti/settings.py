@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'travelhub.apps.TravelhubConfig',
+    'compte',
+    'voyage',
+    'destination',
     # 'rest_framework',
     'psycopg'
 
