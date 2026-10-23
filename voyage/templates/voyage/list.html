@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Voyages</title>
+</head>
+<body>
+    <h1>Mes voyages</h1>
+
+    <form method="get" action="{% url 'voyage:liste_voyages' %}">
+        <button type="submit" name="afficher" value="oui">Afficher tous les voyages</button>
+    </form>
+
+    {% if afficher %}
+        <h2>Liste des voyages</h2>
+        {% for voyage in voyages %}
+            <div>
+                <h3>{{ voyage.titre }}</h3>
+                <p>{{ voyage.description }}</p>
+                <p>Du {{ voyage.date_Debut }} au {{ voyage.date_Fin }}</p>
+                <p>Statut : {{ voyage.get_statut_display }}</p>
+            </div>
+            <hr>
+        {% empty %}
+            <p>Aucun voyage pour l'instant.</p>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

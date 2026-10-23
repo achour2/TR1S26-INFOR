@@ -29,7 +29,7 @@ class   voyages (models.Model):
     description =models.CharField( max_length=1000)
     date_Debut = models.DateField(default=timezone.now) # une fonction qui permet de entrer une dete AAAA-MM-JJ
     date_Fin = models.DateField (default=timezone.now)
-    statut = models.CharField(  max_length=20,choices=Statut.choices,default=Statut.PLANIFIE) # il est obligatoire de choisir un etat parmi ce qu'on a
+    status = models.CharField(  max_length=20,choices=Statut.choices,default=Statut.PLANIFIE) # il est obligatoire de choisir un etat parmi ce qu'on a
     utilisateurs=models.ManyToManyField(User)
     
 

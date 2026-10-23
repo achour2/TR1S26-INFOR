@@ -41,12 +41,13 @@ INSTALLED_APPS = [
     'compte',
     'voyage',
     'destination',
-    # 'rest_framework',
-    'psycopg'
-
-    # 'travelhub',
+    'rest_framework',
+    'psycopg',
+    'graphene_django',
+    #'travelhub',
 
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -143,4 +144,14 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+
+GRAPHENE = {
+    "SCHEMA": "voyage.schema.schema",   # où se trouve ton schéma
+}
+
+REST_FRAMEWORK = {
+  "DEFAULT_AUTHENTICATION_CLASSES": [
+    "rest_framework_simplejwt.authentication.JWTAuthentication",
+  ],
 }

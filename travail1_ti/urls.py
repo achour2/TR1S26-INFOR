@@ -16,8 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from graphene_django.views import GraphQLView
 
-urlpatterns = [
+from rest_framework_simplejwt.views import (
+                    TokenObtainPairView,
+                    TokenRefreshView,)
+
+urlpatterns =[
     path('admin/', admin.site.urls),
-    path("travelHub/",include("travelhub.urls"))
+    path("travelHub/", include("travelhub.urls")),
+
+
+    path("graphql/", GraphQLView.as_view(graphiql=True)),
+
+    path("api/token/",TokenObtainPairView.as_view(),),
+    path("api/token/refresh/",TokenRefreshView.as_view(),),
 ]
