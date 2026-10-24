@@ -1,0 +1,14 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Connexion — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"></head>
+<body class="app-page login-page">
+<main class="form-shell"><section class="form-card">
+    <a class="brand login-brand" href="#"><span class="brand-mark">T</span> TravelHub</a>
+    <p class="eyebrow">BON RETOUR</p><h1>Connexion</h1><p class="intro">Connectez-vous pour retrouver vos voyages.</p>
+    {% if form.errors %}<p class="error-message" role="alert">Nom d’utilisateur ou mot de passe invalide.</p>{% endif %}
+    <form class="trip-form login-form" method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button class="button button-primary" type="submit">Se connecter</button></form>
+    <p class="signup-prompt">Pas encore de compte ? <a href="{% url 'compte:inscription' %}">Créer un compte</a></p>
+</section></main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ voyage.titre }} — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/destination.css' %}">
+</head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell detail-shell">
+    <a class="back-link" href="{% url 'voyage:liste_voyages' %}">← Mes voyages</a>
+    <article class="detail-card">
+        <p class="eyebrow">VOYAGE PARTAGÉ</p>
+        <h1>{{ voyage.titre }}</h1>
+        <div class="detail-dates"><span class="date-box">◷</span><div><small>DATES DU VOYAGE</small><strong>{{ voyage.date_Debut|date:"d/m/Y" }} → {{ voyage.date_Fin|date:"d/m/Y" }}</strong></div></div>
+        <div class="detail-description"><h2>Description</h2><p>{{ voyage.description|default:"Aucune description pour le moment."|linebreaksbr }}</p></div>
+        {% if not voyage.createur_id %}
+            <p class="integration-message" role="status">Ce voyage n'a pas encore de créateur attribué. Un administrateur doit vérifier son propriétaire dans Django Admin avant que les actions de gestion soient disponibles.</p>
+        {% else %}
+            <p class="integration-message" role="status">Vous êtes participant à ce voyage. Seul son créateur peut le modifier ou gérer ses destinations et activités.</p>
+        {% endif %}
+        <section class="destinations-section">
+            <div class="section-heading"><div><p class="eyebrow">ITINÉRAIRE</p><h2>Destinations</h2></div></div>
+            {% for destination in voyage.destinations.all %}
+                <article class="destination-card">
+                    <h3><a href="{% url 'voyage:destination:detail' voyage.pk destination.pk %}">{{ destination.ville }}, {{ destination.pays }}</a></h3>
+                    <p>{{ destination.date_Arrive|date:"d/m/Y" }} → {{ destination.date_Depart|date:"d/m/Y" }}</p>
+                    <strong>Activités</strong>
+                    {% for activite in destination.activites.all %}<p>{{ activite.date|date:"d/m/Y" }} — {{ activite.nom }} ({{ activite.cout }} $)</p>{% empty %}<p>Aucune activité planifiée.</p>{% endfor %}
+                </article>
+            {% empty %}<p>Aucune destination planifiée.</p>{% endfor %}
+        </section>
+    </article>
+</main>
+</body>
+</html>

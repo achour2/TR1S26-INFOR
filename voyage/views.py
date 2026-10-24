@@ -1,83 +1,149 @@
-from django.shortcuts import render, redirect
-from travelhub.models import voyages
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-# Create your views here.
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.dateparse import parse_date
 
-def creer_voyage(request,):
+from travelhub.models import voyages
+
+
+def _form_data(request):
+    """Valide les champs communs aux formulaires de création et de modification."""
+    data = {
+        "titre": request.POST.get("titre", "").strip(),
+        "description": request.POST.get("description", "").strip(),
+        "date_Debut": request.POST.get("date_Debut", ""),
+        "date_Fin": request.POST.get("date_Fin", ""),
+        "status": request.POST.get("status", voyages.Statut.PLANIFIE),
+    }
     erreurs = []
-    if request.method == 'POST':
-        titre = request.POST.get('titre')
-        description = request.POST.get('description')
-        date_Debut = request.POST.get('date_Debut')
-        date_Fin= request.POST.get('date_Fin')
-        status = request.POST.get('status')
-# verifier la validiter des donnees
-        if not titre :
-            erreurs.append('le titre est obligatoire')
-        if not date_Debut :
-            erreurs.append('la date de debut est obligtoire')
-        if not date_Fin or date_Fin < date_Debut:
-            erreurs.append('verifier la date de fin')
+    for champ, libelle in (("date_Debut", "début"), ("date_Fin", "fin")):
+        if data[champ]:
+            parsed = parse_date(data[champ])
+            if parsed is None:
+                erreurs.append(f"La date de {libelle} est invalide.")
+                data[champ] = None
+            else:
+                data[champ] = parsed
+    if not data["titre"]:
+        erreurs.append("Le titre est obligatoire.")
+    if not data["date_Debut"]:
+        erreurs.append("La date de début est obligatoire.")
+    if not data["date_Fin"]:
+        erreurs.append("La date de fin est obligatoire.")
+    elif data["date_Debut"] and data["date_Fin"] < data["date_Debut"]:
+        erreurs.append("La date de fin doit être égale ou postérieure à la date de début.")
+    if data["status"] not in voyages.Statut.values:
+        erreurs.append("Veuillez choisir un statut valide.")
+    if len(data["titre"]) > 100:
+        erreurs.append("Le titre ne peut pas dépasser 100 caractères.")
+    if len(data["description"]) > 1000:
+        erreurs.append("La description ne peut pas dépasser 1000 caractères.")
+    return data, erreurs
+
+
+@login_required
+def liste_voyages(request):
+    queryset = voyages.objects.filter(
+        Q(createur=request.user) | Q(utilisateurs=request.user)
+    ).distinct()
+
+    recherche = request.GET.get("q", "").strip()
+    statut = request.GET.get("status", "")
+    if recherche:
+        queryset = queryset.filter(
+            Q(titre__icontains=recherche) | Q(description__icontains=recherche)
+        )
+    if statut in voyages.Statut.values:
+        queryset = queryset.filter(status=statut)
+
+    tris = {
+        "date_debut": "date_Debut",
+        "date_fin": "date_Fin",
+        "-date_debut": "-date_Debut",
+        "-date_fin": "-date_Fin",
+    }
+    tri = request.GET.get("tri", "date_debut")
+    if tri == "titre":
+        queryset = queryset.order_by("titre")
+    elif tri == "-titre":
+        queryset = queryset.order_by("-titre")
+    else:
+        queryset = queryset.order_by(tris.get(tri, "date_Debut"))
+
+    return render(request, "voyage/list.html", {
+        "voyages": queryset,
+        "statuts": voyages.Statut.choices,
+        "recherche": recherche,
+        "statut_selectionne": statut,
+        "tri": tri,
+    })
+
+
+@login_required
+def detail_voyage(request, pk):
+    voyage = get_object_or_404(
+        voyages.objects.prefetch_related("destinations__activites").filter(
+            Q(createur=request.user) | Q(utilisateurs=request.user)
+        ),
+        pk=pk,
+    )
+    peut_modifier = voyage.createur_id == request.user.pk
+    if not peut_modifier:
+        return render(request, "voyage/detail_participant.html", {"voyage": voyage})
+    return render(request, "voyage/detail.html", {"voyage": voyage})
+
+
+@login_required
+def creer_voyage(request):
+    erreurs = []
+    data = None
+    if request.method == "POST":
+        data, erreurs = _form_data(request)
         if not erreurs:
-            voyages.objects.create(titre=titre, description=description,
-                                date_Debut=date_Debut, date_Fin=date_Fin,
-                                status=status)
-            return redirect('voyage:creer') # retour, un message de creation
-
-    context = {'erreurs': erreurs} #pour le HTML
-    context['voyages'] = voyages.objects.order_by('date_Debut')
-    return render(request, 'voyage/list.html', context=context)
-
-# trouver un voyage avec son nom
-def selictionner_voyage(request,titre):
-    if request.method == 'GET' :
-        voyage = voyages.objects.filter(titre=titre)
-
-        if voyage.exists():
-            print ("voyage trouver")
-        else :
-            return ("voyage introuvable")
-
-        for voyage in voyages:
-            print(voyage.titre,
-                  voyage.description,
-                  voyage.date_Debut,
-                  voyage.date_Fin)
-    return
-
-# afficher tout les voyage
-def liste_voyages (request) :
-    if request.method == 'GET':
-        voyage = voyages.objects.all()
-
-    for voyage in voyages:
-        print(voyage.titre,
-              voyage.description,
-              voyage.date_Debut,
-              voyage.date_Fin)
-
-    voyage = (voyages.objects.order_by('date_Debut')) # Les affiches par le date la plus proche
-    return render(request, 'voyage/list.html', {'voyages': voyage},)
+            voyage = voyages.objects.create(createur=request.user, **data)
+            voyage.utilisateurs.add(request.user)
+            return redirect("voyage:detail", pk=voyage.pk)
+    return render(request, "voyage/form.html", {
+        "erreurs": erreurs,
+        "donnees": data or {},
+        "statuts": voyages.Statut.choices,
+        "titre_page": "Créer un voyage",
+        "bouton": "Créer",
+    })
 
 
-#modifier un voyage a amiloiree
-def modifier_voyage(request,titre) :
-    if not voyages.titre :
-        return HttpResponse("le voyage n'existe pas choisez un autre titre")
-    else :
-        voyage = (voyages.objects.filter(titre=titre )
-                  .exclude(titre__contains="Alger" == titre )
-                  .update(titre=titre))
-        return HttpResponse("la modification de voyage est a jour")
+@login_required
+def modifier_voyage(request, pk):
+    voyage = get_object_or_404(voyages, pk=pk, createur=request.user)
+    erreurs = []
+    data = None
+    if request.method == "POST":
+        data, erreurs = _form_data(request)
+        if not erreurs:
+            for champ, valeur in data.items():
+                setattr(voyage, champ, valeur)
+            voyage.save()
+            return redirect("voyage:detail", pk=voyage.pk)
+    return render(request, "voyage/form.html", {
+        "voyage": voyage,
+        "erreurs": erreurs,
+        "donnees": data or {
+            "titre": voyage.titre,
+            "description": voyage.description,
+            "date_Debut": voyage.date_Debut,
+            "date_Fin": voyage.date_Fin,
+            "status": voyage.status,
+        },
+        "statuts": voyages.Statut.choices,
+        "titre_page": "Modifier le voyage",
+        "bouton": "Enregistrer",
+    })
 
-#supprimer un voyege
-def supprimer_voyage(request,titre):
-    if not voyages.titre :
-        return HttpResponse("le voyage n'exicte pas choisez un autre titre")
-    else :
-        voyage = voyages.objects.get(titre=titre)
+
+@login_required
+def supprimer_voyage(request, pk):
+    voyage = get_object_or_404(voyages, pk=pk, createur=request.user)
+    if request.method == "POST":
         voyage.delete()
-        return HttpResponse ("le voyge ", voyages.objects.get(titre=titre), "est bien supprimer ")
-
-
+        return redirect("voyage:liste_voyages")
+    return render(request, "voyage/confirm_delete.html", {"voyage": voyage})

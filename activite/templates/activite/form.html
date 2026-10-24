@@ -1,0 +1,22 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ titre_page }} — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell">
+    <a class="back-link" href="{% url 'voyage:destination:detail' voyage.pk destination.pk %}">← {{ destination.ville }}, {{ destination.pays }}</a>
+    <section class="form-card"><p class="eyebrow">{{ voyage.titre }} · {{ destination.ville }}</p><h1>{{ titre_page }}</h1><p class="intro">Ajoutez une activité à votre programme.</p>
+        {% for erreur in erreurs %}<p class="error-message" role="alert">{{ erreur }}</p>{% endfor %}
+        <form class="trip-form" method="post">{% csrf_token %}
+            <p><label for="nom">Nom de l'activité</label><input id="nom" name="nom" maxlength="100" required value="{{ valeurs.nom|default:'' }}"></p>
+            <p><label for="categorie">Catégorie</label><input id="categorie" name="categorie" maxlength="1000" required placeholder="Culture, plein air, gastronomie…" value="{{ valeurs.categorie|default:'' }}"></p>
+            <p><label for="description">Description</label><textarea id="description" name="description" maxlength="1000">{{ valeurs.description|default:'' }}</textarea></p>
+            <p><label for="date">Date</label><input id="date" name="date" type="date" required value="{{ valeurs.date|date:'Y-m-d' }}"></p>
+            <p><label for="cout">Coût (CAD)</label><input id="cout" name="cout" type="number" min="0" max="9999999999.99" step="0.01" required value="{{ valeurs.cout|default:'0.00' }}"></p>
+            <div class="form-actions"><button class="button button-primary" type="submit">{{ bouton }}</button><a class="button button-quiet" href="{% url 'voyage:destination:detail' voyage.pk destination.pk %}">Annuler</a></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

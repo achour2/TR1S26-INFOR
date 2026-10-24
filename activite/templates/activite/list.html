@@ -1,0 +1,15 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Activités — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="page-shell">
+    <section class="page-heading"><div><p class="eyebrow">VOTRE PROGRAMME</p><h1>Activités</h1><p class="intro">Vos activités planifiées dans toutes vos destinations.</p></div><a class="button button-primary" href="{% url 'travelhub_destinations' %}">Parcourir les destinations</a></section>
+    <section class="activity-list">
+        {% for activite in activites %}<article class="activity-list-card"><span class="activity-list-date"><strong>{{ activite.date|date:"d" }}</strong><small>{{ activite.date|date:"M" }}</small></span><div class="activity-list-info"><span class="eyebrow">{{ activite.destination.ville }}, {{ activite.destination.pays }} · {{ activite.destination.voyages.titre }}</span><h2>{{ activite.nom }}</h2><p>{{ activite.description|default:"Aucune description."|truncatewords:24 }}</p></div><div class="activity-list-meta"><span class="status-pill">{{ activite.categorie }}</span><strong>{{ activite.cout }} $</strong><a href="{% url 'voyage:destination:detail' activite.destination.voyages.pk activite.destination.pk %}">Ouvrir la destination →</a></div></article>
+        {% empty %}<div class="empty-state"><span class="empty-icon">✦</span><h3>Aucune activité planifiée</h3><p>Ajoutez des activités depuis la page d’une destination.</p><a class="button button-primary" href="{% url 'travelhub_destinations' %}">Voir les destinations</a></div>{% endfor %}
+    </section>
+</main>
+</body>
+</html>

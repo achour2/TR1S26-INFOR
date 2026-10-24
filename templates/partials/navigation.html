@@ -1,0 +1,13 @@
+<header class="topbar app-topbar">
+    <a class="brand" href="{% url 'travelhub_accueil' %}"><span class="brand-mark">T</span> TravelHub</a>
+    <nav class="app-nav" aria-label="Navigation principale">
+        <a class="{% if request.resolver_match.namespace == 'voyage' %}is-active{% endif %}" href="{% url 'voyage:liste_voyages' %}">Voyages</a>
+        <a class="{% if request.resolver_match.url_name == 'travelhub_destinations' or request.resolver_match.namespace == 'destination' %}is-active{% endif %}" href="{% url 'travelhub_destinations' %}">Destinations</a>
+        <a class="{% if request.resolver_match.namespace == 'activite' %}is-active{% endif %}" href="{% url 'activite:liste' %}">Activités</a>
+        <a class="{% if request.resolver_match.namespace == 'compte' %}is-active{% endif %}" href="{% url 'compte:profil' %}">Mon compte</a>
+    </nav>
+    <div class="account-menu">
+        <span>{{ request.user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="button button-quiet" type="submit">Déconnexion</button></form>
+    </div>
+</header>

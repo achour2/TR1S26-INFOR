@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 
 # class utilisateurs (models.Model):
@@ -30,7 +29,27 @@ class   voyages (models.Model):
     date_Debut = models.DateField(default=timezone.now) # une fonction qui permet de entrer une dete AAAA-MM-JJ
     date_Fin = models.DateField (default=timezone.now)
     status = models.CharField(  max_length=20,choices=Statut.choices,default=Statut.PLANIFIE) # il est obligatoire de choisir un etat parmi ce qu'on a
-    utilisateurs=models.ManyToManyField(User)
+    createur = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="voyages_crees",
+        verbose_name="créateur",
+    )
+    utilisateurs = models.ManyToManyField(
+        User,
+        related_name="voyages_participes",
+        verbose_name="participants",
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(date_Debut__lte=models.F("date_Fin")),
+                name="voyage_dates_coherentes",
+            ),
+        ]
     
 
 class destinations(models.Model):
@@ -38,13 +57,29 @@ class destinations(models.Model):
     pays=models.CharField(max_length=500)
     date_Arrive = models.DateField(default=timezone.now) # une fonction qui permet de entrer une dete AAAA-MM-JJ
     date_Depart = models.DateField (default=timezone.now)
-    voyages=models.ForeignKey(voyages,on_delete=models.CASCADE)
+    voyages = models.ForeignKey(voyages, on_delete=models.CASCADE, related_name="destinations")
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(date_Arrive__lte=models.F("date_Depart")),
+                name="destination_dates_coherentes",
+            ),
+        ]
 
 class Activite(models.Model):
     nom = models.CharField(  max_length=100)
     description =models.CharField( max_length=1000)
     categorie=models.CharField( max_length=1000)
     date = models.DateField(default=timezone.now) # une fonction qui permet de entrer une dete AAAA-MM-JJ
-    cout = models.FloatField (default=timezone.now)
-    destination=models.ForeignKey(destinations,on_delete=models.CASCADE)
+    cout = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    destination = models.ForeignKey(destinations, on_delete=models.CASCADE, related_name="activites")
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(cout__gte=0),
+                name="activite_cout_non_negatif",
+            ),
+        ]
    

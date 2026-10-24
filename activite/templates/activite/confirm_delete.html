@@ -1,0 +1,13 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Supprimer une activité — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell"><section class="form-card confirm-card">
+    <span class="warning-icon" aria-hidden="true">!</span><p class="eyebrow">CONFIRMATION</p>
+    <h1>Supprimer cette activité ?</h1><p>L'activité <strong>{{ activite.nom }}</strong> sera supprimée définitivement.</p>
+    <div class="form-actions"><form method="post">{% csrf_token %}<button class="button button-danger" type="submit">Confirmer la suppression</button></form><a class="button button-quiet" href="{% url 'voyage:destination:detail' voyage.pk destination.pk %}">Annuler</a></div>
+</section></main>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ destination.ville }} — {{ voyage.titre }} — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/destination.css' %}">
+</head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell detail-shell">
+    <a class="back-link" href="{% url 'voyage:detail' voyage.pk %}">← {{ voyage.titre }}</a>
+    <article class="detail-card">
+        <p class="eyebrow">DESTINATION DU VOYAGE</p>
+        <h1>{{ destination.ville }}, {{ destination.pays }}</h1>
+        <div class="detail-dates"><span class="date-box">◷</span><div><small>DATES DU SÉJOUR</small><strong>{{ destination.date_Arrive|date:"d/m/Y" }} → {{ destination.date_Depart|date:"d/m/Y" }}</strong></div></div>
+        {% if not voyage.createur_id %}
+            <p class="integration-message" role="status">Ce voyage n'a pas encore de créateur attribué. Un administrateur doit vérifier son propriétaire dans Django Admin.</p>
+        {% else %}
+            <p class="integration-message" role="status">Vous êtes participant à ce voyage. Seul son créateur peut modifier cette destination et ses activités.</p>
+        {% endif %}
+        <section class="destinations-section">
+            <div class="section-heading"><div><p class="eyebrow">PROGRAMME</p><h2>Activités</h2></div></div>
+            {% for activite in activites %}
+                <article class="activity-detail-card"><div class="activity-detail-top"><span class="status-pill">{{ activite.categorie }}</span><span class="activity-date">{{ activite.date|date:"d/m/Y" }}</span></div><h3>{{ activite.nom }}</h3><p>{{ activite.description|default:"Pas de description."|linebreaksbr }}</p><div class="activity-detail-bottom"><strong>{{ activite.cout }} $</strong></div></article>
+            {% empty %}<p>Aucune activité planifiée.</p>{% endfor %}
+        </section>
+    </article>
+</main>
+</body>
+</html>

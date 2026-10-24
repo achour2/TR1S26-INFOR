@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Changer mon mot de passe — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/compte.css' %}">
+</head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell account-form-shell">
+    <section class="form-card">
+        <a class="back-link" href="{% url 'compte:profil' %}">← Retour à mon compte</a>
+        <p class="eyebrow">SÉCURITÉ</p>
+        <h1>Changer mon mot de passe</h1>
+        <p class="intro">Confirmez votre mot de passe actuel, puis choisissez-en un nouveau.</p>
+        <form class="trip-form" method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="error-message" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% if form.non_field_errors %}<div class="error-message" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}{{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+                    {% for error in field.errors %}<span class="error-message" role="alert">{{ error }}</span>{% endfor %}
+                </p>
+            {% endfor %}
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">Mettre à jour le mot de passe</button>
+                <a class="button button-secondary" href="{% url 'compte:profil' %}">Annuler</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

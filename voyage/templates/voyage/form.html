@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ titre_page }} — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell">
+    <a class="back-link" href="{% if voyage %}{% url 'voyage:detail' voyage.pk %}{% else %}{% url 'voyage:liste_voyages' %}{% endif %}">← Retour</a>
+    <section class="form-card">
+    <p class="eyebrow">PLANIFICATION</p><h1>{{ titre_page }}</h1><p class="intro">Ajoutez les détails pour préparer votre escapade.</p>
+    {% for erreur in erreurs %}<p class="error-message" role="alert">{{ erreur }}</p>{% endfor %}
+    <form class="trip-form" method="post">
+        {% csrf_token %}
+        <p><label for="titre">Titre</label><input id="titre" name="titre" maxlength="100" required value="{{ donnees.titre }}"></p>
+        <p><label for="description">Description</label><textarea id="description" name="description" maxlength="1000">{{ donnees.description }}</textarea></p>
+        <p><label for="date_Debut">Date de début</label><input id="date_Debut" name="date_Debut" type="date" required value="{{ donnees.date_Debut|date:'Y-m-d' }}"></p>
+        <p><label for="date_Fin">Date de fin</label><input id="date_Fin" name="date_Fin" type="date" required value="{{ donnees.date_Fin|date:'Y-m-d' }}"></p>
+        <p><label for="status">Statut</label><select id="status" name="status">
+            {% for valeur, libelle in statuts %}<option value="{{ valeur }}" {% if donnees.status == valeur %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+        </select></p>
+        <div class="form-actions"><button class="button button-primary" type="submit">{{ bouton }}</button>
+        <a class="button button-quiet" href="{% if voyage %}{% url 'voyage:detail' voyage.pk %}{% else %}{% url 'voyage:liste_voyages' %}{% endif %}">Annuler</a></div>
+    </form>
+    </section>
+</main>
+</body>
+</html>

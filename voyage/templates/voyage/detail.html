@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ voyage.titre }} — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell detail-shell">
+    <a class="back-link" href="{% url 'voyage:liste_voyages' %}">← Mes voyages</a>
+    <article class="detail-card">
+        <div class="detail-hero"><span class="trip-icon" aria-hidden="true">✦</span><span class="status-pill status-{{ voyage.status }}">{{ voyage.get_status_display }}</span></div>
+        <p class="eyebrow">DÉTAILS DU VOYAGE</p><h1>{{ voyage.titre }}</h1>
+        <div class="detail-dates"><span class="date-box">◷</span><div><small>DATES DU VOYAGE</small><strong>{{ voyage.date_Debut|date:"d/m/Y" }} <span>→</span> {{ voyage.date_Fin|date:"d/m/Y" }}</strong></div></div>
+        <div class="detail-description"><h2>Description</h2><p>{{ voyage.description|default:"Aucune description pour le moment."|linebreaksbr }}</p></div>
+        <section class="destinations-section">
+            <div class="section-heading"><div><p class="eyebrow">ITINÉRAIRE</p><h2>Destinations</h2></div><a class="button button-primary" href="{% url 'voyage:destination:creer' voyage.pk %}">＋ Ajouter une destination</a></div>
+            {% for destination in voyage.destinations.all %}
+                <article class="destination-card">
+                    <div class="destination-heading"><div><h3><a href="{% url 'voyage:destination:detail' voyage.pk destination.pk %}">{{ destination.ville }}, {{ destination.pays }}</a></h3><p>{{ destination.date_Arrive|date:"d/m/Y" }} <span>→</span> {{ destination.date_Depart|date:"d/m/Y" }}</p></div><div class="destination-actions"><a href="{% url 'voyage:destination:modifier' voyage.pk destination.pk %}">Modifier</a><a class="text-danger" href="{% url 'voyage:destination:supprimer' voyage.pk destination.pk %}">Supprimer</a></div></div>
+                    <div class="activities-heading"><h4>Activités <span>{{ destination.activites.all|length }}</span></h4><a href="{% url 'activite:creer' voyage.pk destination.pk %}">＋ Ajouter</a></div>
+                    {% for activite in destination.activites.all %}
+                        <div class="activity-row"><span class="activity-date">{{ activite.date|date:"d/m" }}</span><div class="activity-info"><strong>{{ activite.nom }}</strong><span>{{ activite.categorie }}{% if activite.description %} · {{ activite.description|truncatewords:10 }}{% endif %}</span></div><span class="activity-cost">{{ activite.cout }} $</span><div class="activity-actions"><a aria-label="Modifier {{ activite.nom }}" href="{% url 'activite:modifier' voyage.pk destination.pk activite.pk %}">✎</a><a class="text-danger" aria-label="Supprimer {{ activite.nom }}" href="{% url 'activite:supprimer' voyage.pk destination.pk activite.pk %}">×</a></div></div>
+                    {% empty %}<p class="subtle-empty">Aucune activité planifiée.</p>{% endfor %}
+                </article>
+            {% empty %}
+                <div class="small-empty">Aucune destination pour le moment. Ajoutez une première étape à votre itinéraire.</div>
+            {% endfor %}
+        </section>
+        <div class="form-actions"><a class="button button-primary" href="{% url 'voyage:modifier' voyage.pk %}">Modifier le voyage</a><a class="button button-danger" href="{% url 'voyage:supprimer' voyage.pk %}">Supprimer</a></div>
+    </article>
+</main>
+</body>
+</html>

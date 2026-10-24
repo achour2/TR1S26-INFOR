@@ -1,0 +1,24 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Accueil — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="page-shell dashboard-shell">
+    <section class="page-heading"><div><p class="eyebrow">VOTRE ESPACE VOYAGE</p><h1>Bonjour {{ request.user.first_name|default:request.user.username }} 👋</h1><p class="intro">Tout votre voyage, de la planification aux activités, au même endroit.</p></div><a class="button button-primary" href="{% url 'voyage:creer' %}">＋ Planifier un voyage</a></section>
+    <section class="module-grid" aria-label="Applications TravelHub">
+        <a class="module-card module-trips" href="{% url 'voyage:liste_voyages' %}"><span class="module-symbol">✈</span><span class="module-count">{{ nombre_voyages }}</span><h2>Voyages</h2><p>Créez et gérez vos projets de voyage.</p><span class="module-link">Ouvrir mes voyages →</span></a>
+        <a class="module-card module-destinations" href="{% url 'travelhub_destinations' %}"><span class="module-symbol">⌖</span><span class="module-count">{{ nombre_destinations }}</span><h2>Destinations</h2><p>Retrouvez les étapes de tous vos voyages.</p><span class="module-link">Voir les destinations →</span></a>
+        <a class="module-card module-activities" href="{% url 'activite:liste' %}"><span class="module-symbol">✦</span><span class="module-count">{{ nombre_activites }}</span><h2>Activités</h2><p>Consultez votre programme et vos activités.</p><span class="module-link">Voir les activités →</span></a>
+        <a class="module-card module-account" href="{% url 'compte:profil' %}"><span class="module-symbol">◎</span><span class="module-count module-count-text">›</span><h2>Mon compte</h2><p>Consultez votre profil et vos statistiques.</p><span class="module-link">Ouvrir mon compte →</span></a>
+    </section>
+    <section class="dashboard-upcoming">
+        <div class="results-heading"><h2>Vos prochains voyages</h2><a href="{% url 'voyage:liste_voyages' %}">Tous les voyages →</a></div>
+        <div class="upcoming-list">
+            {% for voyage in prochains_voyages %}<a class="upcoming-item" href="{% url 'voyage:detail' voyage.pk %}"><span class="upcoming-date">{{ voyage.date_Debut|date:"d/m" }}</span><span class="upcoming-info"><strong>{{ voyage.titre }}</strong><small>{{ voyage.date_Debut|date:"d/m/Y" }} — {{ voyage.date_Fin|date:"d/m/Y" }}</small></span><span class="status-pill status-{{ voyage.status }}">{{ voyage.get_status_display }}</span><span class="upcoming-arrow">→</span></a>
+            {% empty %}<div class="small-empty">Vous n’avez pas encore de voyage. <a href="{% url 'voyage:creer' %}">Planifiez votre première escapade.</a></div>{% endfor %}
+        </div>
+    </section>
+</main>
+</body>
+</html>

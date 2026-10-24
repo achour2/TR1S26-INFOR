@@ -1,0 +1,21 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mon compte — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="page-shell profile-shell">
+    <section class="page-heading"><div><p class="eyebrow">ESPACE PERSONNEL</p><h1>Mon compte</h1><p class="intro">Vos informations et votre activité TravelHub.</p></div></section>
+    <section class="profile-card"><div class="profile-avatar">{{ request.user.username|first|upper }}</div><div class="profile-identity"><p class="eyebrow">PROFIL</p><h2>{{ request.user.get_full_name|default:request.user.username }}</h2><p>{{ request.user.email|default:"Aucune adresse courriel renseignée" }}</p><span class="profile-since">Membre depuis le {{ request.user.date_joined|date:"d/m/Y" }}</span></div></section>
+    <section class="profile-stats"><a href="{% url 'voyage:liste_voyages' %}"><strong>{{ nombre_voyages }}</strong><span>Voyages</span><small>Gérer mes voyages →</small></a><a href="{% url 'travelhub_destinations' %}"><strong>{{ nombre_destinations }}</strong><span>Destinations</span><small>Voir mes destinations →</small></a><a href="{% url 'activite:liste' %}"><strong>{{ nombre_activites }}</strong><span>Activités</span><small>Voir mes activités →</small></a></section>
+    <section class="profile-card profile-management">
+        <div><p class="eyebrow">GESTION DU COMPTE</p><h2>Gérer mes informations</h2><p>Modifiez vos coordonnées ou sécurisez votre accès.</p></div>
+        <div class="profile-actions">
+            <a class="button button-primary" href="{% url 'compte:modifier_profil' %}">Modifier mon nom et mon courriel</a>
+            <a class="button button-secondary" href="{% url 'compte:modifier_mot_de_passe' %}">Changer mon mot de passe</a>
+            <a class="button button-danger" href="{% url 'compte:supprimer_compte' %}">Supprimer mon compte</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

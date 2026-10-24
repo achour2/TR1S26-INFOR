@@ -1,29 +1,61 @@
+{% load static %}
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Voyages</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mes voyages — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/destination.css' %}">
 </head>
-<body>
-    <h1>Mes voyages</h1>
+<body class="app-page">
+    {% include 'partials/navigation.html' %}
+    <main class="page-shell">
+        <section class="page-heading">
+            <div><p class="eyebrow">VOTRE PROCHAINE AVENTURE</p><h1>Mes voyages</h1><p class="intro">Retrouvez et organisez toutes vos escapades au même endroit.</p></div>
+            <a class="button button-primary" href="{% url 'voyage:creer' %}"><span aria-hidden="true">＋</span> Créer un voyage</a>
+        </section>
 
-    <form method="get" action="{% url 'voyage:liste_voyages' %}">
-        <button type="submit" name="afficher" value="oui">Afficher tous les voyages</button>
-    </form>
-
-    {% if afficher %}
-        <h2>Liste des voyages</h2>
-        {% for voyage in voyages %}
-            <div>
-                <h3>{{ voyage.titre }}</h3>
-                <p>{{ voyage.description }}</p>
-                <p>Du {{ voyage.date_Debut }} au {{ voyage.date_Fin }}</p>
-                <p>Statut : {{ voyage.get_statut_display }}</p>
+        <form class="filter-panel" method="get">
+            <div class="field search-field"><label for="q">Recherche</label>
+            <input id="q" name="q" type="search" value="{{ recherche }}" placeholder="Titre ou description">
             </div>
-            <hr>
-        {% empty %}
-            <p>Aucun voyage pour l'instant.</p>
-        {% endfor %}
-    {% endif %}
+            <div class="field"><label for="status">Statut</label>
+            <select id="status" name="status">
+                <option value="">Tous</option>
+                {% for valeur, libelle in statuts %}
+                    <option value="{{ valeur }}" {% if statut_selectionne == valeur %}selected{% endif %}>{{ libelle }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div class="field"><label for="tri">Trier par</label>
+            <select id="tri" name="tri">
+                <option value="date_debut" {% if tri == 'date_debut' %}selected{% endif %}>Date de début (croissant)</option>
+                <option value="-date_debut" {% if tri == '-date_debut' %}selected{% endif %}>Date de début (décroissant)</option>
+                <option value="date_fin" {% if tri == 'date_fin' %}selected{% endif %}>Date de fin (croissant)</option>
+                <option value="-date_fin" {% if tri == '-date_fin' %}selected{% endif %}>Date de fin (décroissant)</option>
+                <option value="titre" {% if tri == 'titre' %}selected{% endif %}>Titre (A à Z)</option>
+                <option value="-titre" {% if tri == '-titre' %}selected{% endif %}>Titre (Z à A)</option>
+            </select>
+            </div>
+            <button class="button button-dark" type="submit">Filtrer</button>
+            <a class="reset-link" href="{% url 'voyage:liste_voyages' %}">Réinitialiser</a>
+        </form>
+
+        <div class="results-heading"><h2>Vos escapades</h2><span>{{ voyages|length }} voyage{{ voyages|length|pluralize:"s" }}</span></div>
+        <section class="trip-grid">
+            {% for voyage in voyages %}
+                <article class="trip-card">
+                    <div class="trip-card-top"><span class="trip-icon" aria-hidden="true">✦</span><span class="status-pill status-{{ voyage.status }}">{{ voyage.get_status_display }}</span></div>
+                    <h3><a href="{% url 'voyage:detail' voyage.pk %}">{{ voyage.titre }}</a></h3>
+                    <p class="trip-description">{{ voyage.description|default:"Aucune description pour le moment."|truncatewords:24 }}</p>
+                    <div class="trip-dates"><span aria-hidden="true">▣</span> {{ voyage.date_Debut|date:"d/m/Y" }} <span class="date-arrow">→</span> {{ voyage.date_Fin|date:"d/m/Y" }}</div>
+                    <div class="card-actions"><a href="{% url 'voyage:detail' voyage.pk %}">Voir le voyage <span aria-hidden="true">→</span></a><div><a class="icon-action" aria-label="Modifier {{ voyage.titre }}" href="{% url 'voyage:modifier' voyage.pk %}">✎</a><a class="icon-action danger-action" aria-label="Supprimer {{ voyage.titre }}" href="{% url 'voyage:supprimer' voyage.pk %}">×</a></div></div>
+                </article>
+            {% empty %}
+                <div class="empty-state"><span class="empty-icon" aria-hidden="true">✈</span><h3>Aucun voyage trouvé</h3><p>Essayez de modifier les filtres ou planifiez votre prochaine aventure.</p><a class="button button-primary" href="{% url 'voyage:creer' %}">Créer un voyage</a></div>
+            {% endfor %}
+        </section>
+    </main>
 </body>
 </html>

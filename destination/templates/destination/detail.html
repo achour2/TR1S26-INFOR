@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ destination.ville }} — {{ voyage.titre }} — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"><link rel="stylesheet" href="{% static 'css/destination.css' %}"></head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell detail-shell">
+    <a class="back-link" href="{% url 'voyage:detail' voyage.pk %}">← {{ voyage.titre }}</a>
+    <article class="detail-card">
+        <div class="detail-hero"><span class="trip-icon" aria-hidden="true">⌖</span><span class="status-pill">DESTINATION</span></div>
+        <p class="eyebrow">ÉTAPE DE VOTRE VOYAGE</p><h1>{{ destination.ville }}, {{ destination.pays }}</h1>
+        <div class="detail-dates"><span class="date-box">◷</span><div><small>DATES DU SÉJOUR</small><strong>{{ destination.date_Arrive|date:"d/m/Y" }} <span>→</span> {{ destination.date_Depart|date:"d/m/Y" }}</strong></div></div>
+        <section class="external-data-section" aria-labelledby="weather-title">
+            <div class="section-heading"><div><p class="eyebrow">DONNÉES EXTERNES</p><h2 id="weather-title">Météo du séjour</h2></div></div>
+            {% if enrichissement.coordinates %}
+                <p class="coordinates-note">Coordonnées : {{ enrichissement.coordinates.latitude|floatformat:4 }}, {{ enrichissement.coordinates.longitude|floatformat:4 }}{% if enrichissement.coordinates.timezone %} · {{ enrichissement.coordinates.timezone }}{% endif %}</p>
+            {% else %}<p class="integration-message" role="status">{{ enrichissement.location_error }}</p>{% endif %}
+            {% if enrichissement.weather.message %}<p class="integration-message" role="status">{{ enrichissement.weather.message }}</p>{% endif %}
+            {% if enrichissement.weather.days %}
+                <div class="weather-grid">
+                    {% for jour in enrichissement.weather.days %}
+                        <article class="weather-day"><span class="weather-date">{{ jour.date|date:"D d/m" }}</span><strong>{{ jour.condition }}</strong><span>{{ jour.temperature_min|default:"—" }}° / {{ jour.temperature_max|default:"—" }}°C</span><small>Pluie : {{ jour.precipitation|default:"—" }} {{ enrichissement.weather.precipitation_unit }} · Vent : {{ jour.wind_speed|default:"—" }} {{ enrichissement.weather.wind_unit }}</small></article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+        <section class="country-data-section" aria-labelledby="country-title">
+            <div class="section-heading"><div><p class="eyebrow">COUNTRIES GRAPHQL</p><h2 id="country-title">À propos du pays</h2></div></div>
+            {% if enrichissement.country_info %}
+                <dl class="country-facts">
+                    <div><dt>Pays</dt><dd>{{ enrichissement.country_info.name|default:destination.pays }}</dd></div>
+                    <div><dt>Capitale</dt><dd>{{ enrichissement.country_info.capital|default:"Non renseignée" }}</dd></div>
+                    <div><dt>Continent</dt><dd>{{ enrichissement.country_info.continent|default:"Non renseigné" }}</dd></div>
+                    <div><dt>Monnaie</dt><dd>{{ enrichissement.country_info.currency|default:"Non renseignée" }}</dd></div>
+                    <div><dt>Langues</dt><dd>{{ enrichissement.country_info.languages|join:", "|default:"Non renseignées" }}</dd></div>
+                </dl>
+            {% elif enrichissement.country_error %}<p class="integration-message" role="status">{{ enrichissement.country_error }}</p>{% endif %}
+        </section>
+        <section class="destinations-section">
+            <div class="section-heading"><div><p class="eyebrow">À DÉCOUVRIR</p><h2>Activités</h2></div><a class="button button-primary" href="{% url 'activite:creer' voyage.pk destination.pk %}">＋ Ajouter une activité</a></div>
+            {% for activite in activites %}
+                <article class="activity-detail-card"><div class="activity-detail-top"><span class="status-pill">{{ activite.categorie }}</span><span class="activity-date">{{ activite.date|date:"d/m/Y" }}</span></div><h3>{{ activite.nom }}</h3><p>{{ activite.description|default:"Pas de description."|linebreaksbr }}</p><div class="activity-detail-bottom"><strong>{{ activite.cout }} $</strong><div class="destination-actions"><a href="{% url 'activite:modifier' voyage.pk destination.pk activite.pk %}">Modifier</a><a class="text-danger" href="{% url 'activite:supprimer' voyage.pk destination.pk activite.pk %}">Supprimer</a></div></div></article>
+            {% empty %}<div class="small-empty">Aucune activité pour cette destination. Ajoutez-en une pour organiser votre séjour.</div>{% endfor %}
+        </section>
+        <div class="form-actions"><a class="button button-quiet" href="{% url 'voyage:destination:modifier' voyage.pk destination.pk %}">Modifier la destination</a><a class="button button-danger" href="{% url 'voyage:destination:supprimer' voyage.pk destination.pk %}">Supprimer</a></div>
+    </article>
+</main>
+</body>
+</html>

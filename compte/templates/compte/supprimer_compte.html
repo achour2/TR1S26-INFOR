@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Supprimer mon compte — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/compte.css' %}">
+</head>
+<body class="app-page">
+{% include 'partials/navigation.html' %}
+<main class="form-shell account-form-shell">
+    <section class="form-card">
+        <a class="back-link" href="{% url 'compte:profil' %}">← Retour à mon compte</a>
+        <p class="eyebrow account-danger-label">ACTION IRRÉVERSIBLE</p>
+        <h1>Supprimer mon compte</h1>
+        <p class="intro">Votre compte et votre accès à TravelHub seront supprimés. Confirmez votre identité avec votre mot de passe actuel.</p>
+        <form class="trip-form" method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="error-message" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}{{ field }}
+                    {% for error in field.errors %}<span class="error-message" role="alert">{{ error }}</span>{% endfor %}
+                </p>
+            {% endfor %}
+            <div class="form-actions">
+                <button class="button button-danger" type="submit">Confirmer la suppression</button>
+                <a class="button button-secondary" href="{% url 'compte:profil' %}">Garder mon compte</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Créer un compte — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}">
+</head>
+<body class="app-page login-page">
+<main class="form-shell">
+    <section class="form-card">
+        <a class="brand login-brand" href="{% url 'travelhub_accueil' %}"><span class="brand-mark">T</span> TravelHub</a>
+        <p class="eyebrow">BIENVENUE SUR TRAVELHUB</p>
+        <h1>Créer un compte</h1>
+        <p class="intro">Inscrivez-vous pour planifier et gérer vos voyages.</p>
+
+        <form class="trip-form login-form" method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="error-message" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+                    {% for error in field.errors %}<span class="error-message" role="alert">{{ error }}</span>{% endfor %}
+                </p>
+            {% endfor %}
+            <button class="button button-primary" type="submit">Créer mon compte</button>
+        </form>
+        <p class="signup-prompt">Vous avez déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></p>
+    </section>
+</main>
+</body>
+</html>
