@@ -92,17 +92,10 @@ Les services sont publics et ne nécessitent pas de clé pour cet usage. Si une 
 
 À l'inscription, le compte reste inactif jusqu'à la saisie du code reçu par courriel. Le code est à usage unique, expire après 10 minutes par défaut et est limité à cinq tentatives. Les modifications du profil, du mot de passe et la suppression du compte attendent également la confirmation du code envoyé à l'adresse concernée. En développement, Django affiche le message et son code dans le terminal. Le code n'est pas stocké en clair.
 
-Pour recevoir réellement les courriels, définissez les variables SMTP avant de lancer le serveur (les valeurs dépendent de votre fournisseur) :
+Sans configuration SMTP, Django affiche les codes dans le terminal pour le développement. Pour envoyer les courriels avec Gmail, copiez `.env.example` vers `.env`, remplacez les valeurs par celles de votre compte puis redémarrez le serveur :
 
 ```powershell
-$env:EMAIL_HOST = "smtp.gmail.com"
-$env:EMAIL_PORT = "587"
-$env:EMAIL_HOST_USER = "messaoudiachour026@gmail.com"
-$env:EMAIL_HOST_PASSWORD = "zqvvhkmjrrjhvaub"
-$env:EMAIL_USE_TLS = "true"
-$env:EMAIL_USE_SSL = "false"
-$env:DEFAULT_FROM_EMAIL = "TravelHub <messaoudiachour026@gmail.com>"
-
+Copy-Item .env.example .env
 ```
 
-Gardez les identifiants SMTP dans des variables d'environnement ou un gestionnaire de secrets, jamais dans les fichiers suivis par Git. Après récupération de cette modification, appliquez la nouvelle migration avec `python manage.py migrate`.
+Pour Gmail, `EMAIL_HOST_PASSWORD` doit être un mot de passe d'application Google, et non le mot de passe normal du compte. Le fichier `.env` est ignoré par Git : ne partagez pas son contenu. Redémarrez `runserver` après toute modification de ce fichier. Si un serveur SMTP est configuré sans identifiant ou mot de passe, Django signale l'erreur au démarrage au lieu d'afficher les codes dans le terminal.

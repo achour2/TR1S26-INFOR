@@ -13,10 +13,11 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -155,18 +156,26 @@ STATIC_URL = 'static/'
 
 # Les courriels sont affichés dans le terminal en développement. Pour envoyer
 # de vrais messages, définissez EMAIL_HOST et les paramètres SMTP ci-dessous.
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND",
-    "django.core.mail.backends.smtp.EmailBackend"
-    if os.environ.get("EMAIL_HOST")
-    else "django.core.mail.backends.console.EmailBackend",
-)
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com").strip()
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "messaoudiachour026@gmail.com").strip()
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "wkiawvhdbrsejaom")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "true").lower() in {"1", "true", "yes", "on"}
 EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "false").lower() in {"1", "true", "yes", "on"}
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "").strip() or (
+    "django.core.mail.backends.smtp.EmailBackend"
+    if EMAIL_HOST
+    else "django.core.mail.backends.console.EmailBackend"
+)
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+    if not EMAIL_HOST:
+        raise ImproperlyConfigured("Définissez EMAIL_HOST pour utiliser l'envoi SMTP.")
+    if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+        raise ImproperlyConfigured(
+            "Définissez EMAIL_HOST_USER et EMAIL_HOST_PASSWORD dans le fichier .env pour utiliser SMTP."
+        )
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ImproperlyConfigured("EMAIL_USE_TLS et EMAIL_USE_SSL ne peuvent pas être activés ensemble.")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "TravelHub <noreply@travelhub.local>")
 ACCOUNT_VERIFICATION_CODE_TTL_MINUTES = int(os.environ.get("ACCOUNT_VERIFICATION_CODE_TTL_MINUTES", "10"))
 
