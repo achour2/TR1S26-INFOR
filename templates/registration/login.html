@@ -1,14 +1,65 @@
 {% load static %}
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Connexion — TravelHub</title><link rel="stylesheet" href="{% static 'css/voyage.css' %}"></head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f7f5">
+    <title>Connexion — TravelHub</title>
+    <link rel="stylesheet" href="{% static 'css/voyage.css' %}?v=2">
+</head>
 <body class="app-page login-page">
-<main class="form-shell"><section class="form-card">
-    <a class="brand login-brand" href="#"><span class="brand-mark">T</span> TravelHub</a>
-    <p class="eyebrow">BON RETOUR</p><h1>Connexion</h1><p class="intro">Connectez-vous pour retrouver vos voyages.</p>
-    {% if form.errors %}<p class="error-message" role="alert">Nom d’utilisateur ou mot de passe invalide.</p>{% endif %}
-    <form class="trip-form login-form" method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button class="button button-primary" type="submit">Se connecter</button></form>
-    <p class="signup-prompt">Pas encore de compte ? <a href="{% url 'compte:inscription' %}">Créer un compte</a></p>
-</section></main>
+<main class="login-layout">
+    <section class="login-story" aria-label="TravelHub, vos voyages en un seul endroit">
+        <a class="brand login-story-brand" href="{% url 'travelhub_accueil' %}">
+            <span class="brand-mark">T</span> TravelHub
+        </a>
+        <div class="story-copy">
+            <p class="eyebrow">LE VOYAGE COMMENCE ICI</p>
+            <h1>Le monde est à portée de votre prochain départ.</h1>
+            <p>Retrouvez vos itinéraires, vos destinations et vos souvenirs au même endroit.</p>
+        </div>
+        <div class="story-route" aria-hidden="true">
+            <span class="route-pin route-pin-start">✦</span>
+            <span class="route-line"></span>
+            <span class="route-pin route-pin-end">↗</span>
+            <span class="route-label">Prochaine destination</span>
+        </div>
+        <p class="story-footnote">Vos projets de voyage, simplement réunis.</p>
+    </section>
+
+    <section class="login-panel" aria-labelledby="login-title">
+        <div class="login-panel-inner">
+            <a class="brand login-mobile-brand" href="{% url 'travelhub_accueil' %}">
+                <span class="brand-mark">T</span> TravelHub
+            </a>
+            <p class="eyebrow">BON RETOUR</p>
+            <h2 id="login-title">Heureux de vous revoir</h2>
+            <p class="intro">Connectez-vous pour reprendre la préparation de votre prochain voyage.</p>
+
+            {% if form.non_field_errors %}
+                <div class="error-message login-error" role="alert">{{ form.non_field_errors }}</div>
+            {% elif form.errors %}
+                <div class="error-message login-error" role="alert">Nom d’utilisateur ou mot de passe invalide.</div>
+            {% endif %}
+
+            <form class="trip-form login-form" method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% for error in field.errors %}<span class="field-error" role="alert">{{ error }}</span>{% endfor %}
+                    </p>
+                {% endfor %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <button class="button button-primary" type="submit">Se connecter <span aria-hidden="true">→</span></button>
+            </form>
+
+            <p class="signup-prompt">Pas encore de compte ? <a href="{% url 'compte:inscription' %}">Créer un compte</a></p>
+            <a class="login-back-link" href="{% url 'travelhub_accueil' %}">← Retour à l’accueil</a>
+        </div>
+    </section>
+</main>
 </body>
 </html>
