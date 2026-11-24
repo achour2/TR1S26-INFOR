@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -101,17 +102,27 @@ WSGI_APPLICATION = 'travail1_ti.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "travelhub"),
-        "USER": os.environ.get("DB_USER", "traveluser"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "1234"),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
-    },
-}
+if os.getenv ("USE_SQLITE") == "True" : # Pour l'utilisation de SQLITE
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else : # Pour garder la configuration PostgreSQL d'origine de trvail
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "travelhub"),
+            "USER": os.environ.get("DB_USER", "traveluser"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", "1234"),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
+    }
 
 
 # Password validation
