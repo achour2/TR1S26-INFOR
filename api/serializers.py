@@ -13,7 +13,7 @@ class VoyageSerializer(serializers.ModelSerializer):
         model = voyages
         fields = (
             "id", "titre", "description", "date_Debut", "date_Fin",
-            "status", "createur", "participants",
+            "status", "createur", "participants", "image_url",
         )
         read_only_fields = ("id", "createur", "participants")
 

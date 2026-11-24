@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from destination.services import destination_enrichment
 from travelhub.models import Activite, destinations, voyages
 from .serializers import ActiviteSerializer, DestinationSerializer, VoyageSerializer
 
@@ -117,6 +118,11 @@ class DestinationViewSet(OwnedResourcesMixin, viewsets.ModelViewSet):
             if value:
                 queryset = queryset.filter(**{f"{field}__{lookup}": value})
         return queryset.distinct()
+
+    @action(detail=True, methods=("get",), url_path="enrichissement")
+    def enrichissement(self, request, pk=None):
+        """TP2 : météo (Open-Meteo) et pays (Countries GraphQL) pour le front-end Next.js."""
+        return Response(destination_enrichment(self.get_object()))
 
 
 class ActiviteViewSet(OwnedResourcesMixin, viewsets.ModelViewSet):

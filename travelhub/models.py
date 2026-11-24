@@ -42,6 +42,7 @@ class   voyages (models.Model):
         related_name="voyages_participes",
         verbose_name="participants",
     )
+    image_url = models.URLField(max_length=500, blank=True, null=True)  # TP2 : image stockée dans Supabase
 
     class Meta:
         constraints = [
