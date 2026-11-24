@@ -5,7 +5,7 @@
 <body class="app-page">
 {% include 'partials/navigation.html' %}
 <main class="page-shell dashboard-shell">
-    <section class="page-heading"><div><p class="eyebrow">VOTRE ESPACE VOYAGE</p><h1>Bonjour {{ request.user.first_name|default:request.user.username }} 👋</h1><p class="intro">Tout votre voyage, de la planification aux activités, au même endroit.</p></div><a class="button button-primary" href="{% url 'voyage:creer' %}">＋ Planifier un voyage</a></section>
+    <section class="page-heading"><div><p class="eyebrow">VOTRE ESPACE VOYAGE</p><h1>Bonjour {{ request.user.first_name|default:request.user.username }} </h1><p class="intro">Tout votre voyage, de la planification aux activités, au même endroit.</p></div><a class="button button-primary" href="{% url 'voyage:creer' %}">＋ Planifier un voyage</a></section>
     <section class="module-grid" aria-label="Applications TravelHub">
         <a class="module-card module-trips" href="{% url 'voyage:liste_voyages' %}"><span class="module-symbol">✈</span><span class="module-count">{{ nombre_voyages }}</span><h2>Voyages</h2><p>Créez et gérez vos projets de voyage.</p><span class="module-link">Ouvrir mes voyages →</span></a>
         <a class="module-card module-destinations" href="{% url 'travelhub_destinations' %}"><span class="module-symbol">⌖</span><span class="module-count">{{ nombre_destinations }}</span><h2>Destinations</h2><p>Retrouvez les étapes de tous vos voyages.</p><span class="module-link">Voir les destinations →</span></a>
