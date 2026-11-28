@@ -1,9 +1,5 @@
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: synthwave;
-  root: ":root";
-  include: ;
-  exclude: ;
-  prefix: ;
-  logs: true;
+
 }
